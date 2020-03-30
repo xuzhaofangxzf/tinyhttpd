@@ -625,6 +625,18 @@ int startup(u_short *port)
   int namelen = sizeof(name);
   //getsockname()包含于<sys/socker.h>中，参读《TLPI》P1263
   //调用getsockname()获取系统给 httpd 这个 socket 随机分配的端口号
+  /*
+  int getsockname(int sockfd, struct sockaddr *localaddr,socklen_t *addrlen);
+  参数：
+  sockfd：需要获取名称的套接字。
+  localaddr：存放所获取套接字名称的缓冲区。
+  addrlen：作为入口参数，name指向空间的最大长度。作为出口参数，name的实际长度。
+  描述：
+  getsockname可以获得一个与socket相关的地址。
+  服务器端可以通过它得到相关客户端地址。而客户端也可以得到当前已连接成功的socket的ip和端口。
+  对于TCP连接的情况，如果不进行bind指定IP和端口，那么调用connect连接成功后，使用getsockname可以正确获得当前正在通信的socket的IP和端口地址。
+  而对于UDP的情况，无论是在调用sendto之后还是收到服务器返回的信息之后调用，都无法得到正确的ip地址：使用getsockname得到ip为0，端口正确。
+  */
   if (getsockname(httpd, (struct sockaddr *)&name, &namelen) == -1)
    error_die("getsockname");
   *port = ntohs(name.sin_port);
